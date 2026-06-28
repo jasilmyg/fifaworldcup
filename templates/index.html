@@ -70,7 +70,7 @@
                     {% endfor %}
                     
                     <form action="{{ url_for('user.predict', match_id=match.id) }}" method="POST" class="mt-4">
-                        <div class="grid grid-cols-3 gap-2 mb-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
                             <label class="cursor-pointer">
                                 <input type="radio" name="winner" value="home" class="peer sr-only" {% if pred and pred.winner == 'home' %}checked{% endif %} required>
                                 <div class="text-center py-2 glass-card peer-checked:bg-blue-600 peer-checked:border-blue-400 transition hover:bg-white/10 text-sm font-semibold rounded-lg">{{ match.home_team }} Win</div>
@@ -121,11 +121,11 @@
     <div class="space-y-4">
         {% for match in completed_matches %}
         <div class="glass-card p-4 flex justify-between items-center" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
-            <div class="flex-1 text-right font-semibold text-lg">{{ match.home_team }}</div>
-            <div class="mx-6 bg-white/10 px-4 py-1 rounded-full font-black text-xl tracking-wider border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+            <div class="flex-1 text-right font-semibold text-sm sm:text-lg">{{ match.home_team }}</div>
+            <div class="mx-2 sm:mx-6 bg-white/10 px-3 sm:px-4 py-1 rounded-full font-black text-base sm:text-xl tracking-wider border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)] whitespace-nowrap">
                 {{ match.home_score }} - {{ match.away_score }}
             </div>
-            <div class="flex-1 text-left font-semibold text-lg">{{ match.away_team }}</div>
+            <div class="flex-1 text-left font-semibold text-sm sm:text-lg">{{ match.away_team }}</div>
         </div>
         {% endfor %}
     </div>

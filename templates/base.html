@@ -42,10 +42,27 @@
                     <a href="{{ url_for('auth.register') }}" class="premium-btn px-4 py-2 rounded-lg font-semibold">Register</a>
                 {% endif %}
             </div>
-            <!-- Mobile Menu Button (simplified for now) -->
+            <!-- Mobile Menu Button -->
             <div class="md:hidden">
-                <button id="mobile-menu-btn" class="text-white"><i class="fa-solid fa-bars text-2xl"></i></button>
+                <button id="mobile-menu-btn" class="text-white hover:text-blue-400 transition"><i class="fa-solid fa-bars text-2xl"></i></button>
             </div>
+        </div>
+        
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4 pt-4 border-t border-white/10 flex-col space-y-4 text-center pb-2">
+            <a href="{{ url_for('main.index') }}" class="hover:text-blue-400 transition block">Home</a>
+            <a href="{{ url_for('main.leaderboard') }}" class="hover:text-blue-400 transition block">Leaderboard</a>
+            <a href="{{ url_for('main.rules') }}" class="hover:text-blue-400 transition block">Rules</a>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('user.profile') }}" class="hover:text-blue-400 transition block"><i class="fa-solid fa-user mr-1"></i> {{ current_user.name }} ({{ current_user.points }} pts)</a>
+                {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="text-yellow-400 hover:text-yellow-300 transition block"><i class="fa-solid fa-lock mr-1"></i> Admin</a>
+                {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="inline-block premium-btn px-6 py-2 rounded-lg font-semibold mt-2">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="hover:text-blue-400 transition block">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="inline-block premium-btn px-6 py-2 rounded-lg font-semibold mt-2">Register</a>
+            {% endif %}
         </div>
     </nav>
 
@@ -74,5 +91,17 @@
     <!-- AOS Script -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            var menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('flex');
+            }
+        });
+    </script>
 </body>
 </html>
