@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10 px-4 mb-20" data-aos="zoom-in">
+    <div class="glass-card p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Create Account</h2>
+            <p class="text-gray-400 mt-2 text-sm">Join the ultimate prediction contest</p>
+        </div>
+        
+        <form method="POST" action="">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Full Name</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="name" type="text" placeholder="John Doe" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Mobile Number</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="mobile" type="tel" placeholder="1234567890" required>
+                </div>
+                
+                <div class="mb-4 md:col-span-2">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Email Address (Optional)</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="email" type="email" placeholder="john@example.com">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">State</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="state" type="text" placeholder="State">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">District</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="district" type="text" placeholder="District">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Password</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="password" type="password" placeholder="Min 6 characters" required minlength="6">
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-300 text-sm font-bold mb-2">Referral Code (Optional)</label>
+                    <input class="glass-input w-full px-4 py-3 rounded-lg focus:outline-none transition" name="referral" type="text" placeholder="Enter referral code">
+                </div>
+            </div>
+            
+            <button class="premium-btn w-full font-bold py-3 px-4 rounded-lg focus:outline-none shadow-lg text-lg mt-4" type="submit">
+                Register & Play <i class="fa-solid fa-trophy ml-2"></i>
+            </button>
+        </form>
+        
+        <div class="text-center mt-6">
+            <p class="text-gray-400 text-sm">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-blue-400 hover:text-blue-300 font-bold transition">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

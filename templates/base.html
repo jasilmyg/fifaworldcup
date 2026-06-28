@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA World Cup Prediction Contest</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="relative">
+    <div class="football-bg"></div>
+    
+    <nav class="glass-card sticky top-0 z-50 rounded-none border-t-0 border-l-0 border-r-0 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="{{ url_for('main.index') }}" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
+                <i class="fa-solid fa-trophy mr-2 text-yellow-400"></i>WorldCup Predictor
+            </a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="{{ url_for('main.index') }}" class="hover:text-blue-400 transition">Home</a>
+                <a href="{{ url_for('main.leaderboard') }}" class="hover:text-blue-400 transition">Leaderboard</a>
+                <a href="{{ url_for('main.rules') }}" class="hover:text-blue-400 transition">Rules</a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('user.profile') }}" class="hover:text-blue-400 transition"><i class="fa-solid fa-user mr-1"></i> {{ current_user.name }} ({{ current_user.points }} pts)</a>
+                    {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="text-yellow-400 hover:text-yellow-300 transition"><i class="fa-solid fa-lock mr-1"></i> Admin</a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="premium-btn px-4 py-2 rounded-lg font-semibold">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="hover:text-blue-400 transition">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="premium-btn px-4 py-2 rounded-lg font-semibold">Register</a>
+                {% endif %}
+            </div>
+            <!-- Mobile Menu Button (simplified for now) -->
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-white"><i class="fa-solid fa-bars text-2xl"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="max-w-4xl mx-auto mt-4 px-4 z-50 relative">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 mb-4 text-sm rounded-lg glass-card text-white flex items-center justify-between" role="alert">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="glass-card mt-20 py-8 text-center rounded-none border-b-0 border-l-0 border-r-0">
+        <p class="text-gray-400">&copy; 2026 WorldCup Predictor. All rights reserved.</p>
+        <p class="text-sm text-gray-500 mt-2">Not affiliated with FIFA.</p>
+    </footer>
+
+    <!-- AOS Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
