@@ -4,11 +4,18 @@
 <div class="max-w-6xl mx-auto px-4 py-10">
     <div class="flex flex-col md:flex-row justify-between items-center mb-8">
         <h2 class="text-3xl font-bold text-yellow-400 mb-4 md:mb-0"><i class="fa-solid fa-lock text-gray-400 mr-2"></i> Admin Dashboard</h2>
-        <form action="{{ url_for('admin.force_sync') }}" method="POST">
-            <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg flex items-center">
-                <i class="fa-solid fa-rotate text-xl mr-2"></i> Sync Google Sheets
-            </button>
-        </form>
+        <div class="flex space-x-4">
+            <form action="{{ url_for('admin.force_sync') }}" method="POST">
+                <button type="submit" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-2 px-4 rounded-lg transition shadow-lg flex items-center text-sm">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Push Deletions
+                </button>
+            </form>
+            <form action="{{ url_for('admin.force_restore') }}" method="POST">
+                <button type="submit" class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-2 px-4 rounded-lg transition shadow-lg flex items-center text-sm">
+                    <i class="fa-solid fa-cloud-arrow-down mr-2"></i> Restore DB
+                </button>
+            </form>
+        </div>
     </div>
     
     <!-- Stats Cards -->

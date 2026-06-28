@@ -97,3 +97,17 @@ def force_sync():
     result_msg = GoogleSheetSync.sync_down()
     flash(result_msg, 'success')
     return redirect(url_for('admin.dashboard'))
+
+@admin_bp.route('/force_restore', methods=['POST', 'GET'])
+@login_required
+@admin_required
+def force_restore():
+    try:
+        success = GoogleSheetSync.restore_from_sheets()
+        if success:
+            flash("Database successfully restored from Google Sheets!", "success")
+        else:
+            flash("Failed to restore. Check Vercel logs or your GOOGLE_CREDENTIALS env var.", "danger")
+    except Exception as e:
+        flash(f"Restore crashed with error: {str(e)}", "danger")
+    return redirect(url_for('admin.dashboard'))
