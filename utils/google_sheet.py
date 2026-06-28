@@ -151,3 +151,131 @@ class GoogleSheetSync:
             
         db.session.commit()
         return "Synced down successfully. " + ", ".join(logs)
+
+    @classmethod
+    def restore_from_sheets(cls):
+        from models import db, User, Match, Prediction
+        from routes.auth import bcrypt
+        
+        sheet = cls.get_spreadsheet()
+        if not sheet:
+            print("[Sheet Sync ERROR] Failed to connect for restoration.")
+            return False
+            
+        print("[Sheet Sync] Starting database restoration from Google Sheets...")
+        
+        # 1. Restore Users
+        try:
+            ws = sheet.worksheet("Users")
+            records = ws.get_all_records()
+            for r in records:
+                if not r.get('ID'): continue
+                user_id = int(r['ID'])
+                if not User.query.get(user_id):
+                    # Set a default password hash for restored users (their mobile number)
+                    dummy_hash = bcrypt.generate_password_hash(str(r.get('Mobile', '123456'))).decode('utf-8')
+                    user = User(
+                        id=user_id,
+                        name=r.get('Name', ''),
+                        mobile=str(r.get('Mobile', '')),
+                        email=r.get('Email', ''),
+                        district=r.get('District', ''),
+                        state=r.get('State', ''),
+                        referral_code=r.get('Referral Code', ''),
+                        points=int(r.get('Points', 0) or 0),
+                        password=dummy_hash
+                    )
+                    
+                    if r.get('Registered At'):
+                        try:
+                            dt_str = str(r['Registered At'])
+                            if '.' in dt_str:
+                                user.created_at = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S.%f")
+                            else:
+                                user.created_at = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+                        except Exception: pass
+                    db.session.add(user)
+            db.session.commit()
+            print(f"[Sheet Sync] Restored users.")
+        except Exception as e:
+            print(f"[Sheet Sync] User restore error: {e}")
+            db.session.rollback()
+
+        # 2. Restore Matches
+        try:
+            ws = sheet.worksheet("Matches")
+            records = ws.get_all_records()
+            for r in records:
+                if not r.get('ID'): continue
+                match_id = int(r['ID'])
+                if not Match.query.get(match_id):
+                    match = Match(
+                        id=match_id,
+                        home_team=r.get('Home Team', ''),
+                        away_team=r.get('Away Team', ''),
+                        venue=r.get('Venue', ''),
+                        status=r.get('Status', 'upcoming')
+                    )
+                    if r.get('Kickoff Time'):
+                        try:
+                            dt_str = str(r['Kickoff Time'])
+                            if '.' in dt_str:
+                                match.kickoff_time = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S.%f")
+                            else:
+                                match.kickoff_time = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+                        except Exception: 
+                            match.kickoff_time = datetime.utcnow()
+                    else:
+                        match.kickoff_time = datetime.utcnow()
+                        
+                    db.session.add(match)
+            db.session.commit()
+            
+            # Update match scores from Results
+            try:
+                ws_res = sheet.worksheet("Results")
+                res_records = ws_res.get_all_records()
+                for res in res_records:
+                    if not res.get('Match ID'): continue
+                    match = Match.query.get(int(res['Match ID']))
+                    if match:
+                        if res.get('Home Score') != '': match.home_score = int(res['Home Score'])
+                        if res.get('Away Score') != '': match.away_score = int(res['Away Score'])
+                        db.session.add(match)
+                db.session.commit()
+            except Exception: pass
+            
+            print(f"[Sheet Sync] Restored matches.")
+        except Exception as e:
+            print(f"[Sheet Sync] Match restore error: {e}")
+            db.session.rollback()
+
+        # 3. Restore Predictions
+        try:
+            ws = sheet.worksheet("Predictions")
+            records = ws.get_all_records()
+            for r in records:
+                if not r.get('ID'): continue
+                pred_id = int(r['ID'])
+                if not Prediction.query.get(pred_id):
+                    user_id = int(r.get('User ID', 0) or 0)
+                    match_id = int(r.get('Match ID', 0) or 0)
+                    if User.query.get(user_id) and Match.query.get(match_id):
+                        pred = Prediction(
+                            id=pred_id,
+                            user_id=user_id,
+                            match_id=match_id,
+                            winner=r.get('Winner', ''),
+                            home_score=int(r.get('Home Score', 0) or 0),
+                            away_score=int(r.get('Away Score', 0) or 0),
+                            points_awarded=int(r.get('Points Awarded', 0) or 0),
+                            status=r.get('Status', 'pending')
+                        )
+                        db.session.add(pred)
+            db.session.commit()
+            print(f"[Sheet Sync] Restored predictions.")
+        except Exception as e:
+            print(f"[Sheet Sync] Prediction restore error: {e}")
+            db.session.rollback()
+            
+        return True

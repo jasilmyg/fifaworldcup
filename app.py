@@ -37,6 +37,14 @@ def create_app(config_class=Config):
     with app.app_context():
         try:
             db.create_all()
+            
+            # Restore from Google Sheets if database is completely empty (e.g., on Vercel cold start)
+            from models import Match
+            if Match.query.count() == 0:
+                print("Database appears empty. Attempting to restore from Google Sheets...")
+                from utils.google_sheet import GoogleSheetSync
+                GoogleSheetSync.restore_from_sheets()
+                
             # Create default admin if not exists
             if not User.query.filter_by(mobile='admin').first():
                 hashed_pw = bcrypt.generate_password_hash('admin123').decode('utf-8')
