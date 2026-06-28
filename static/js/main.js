@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     AOS.init({
         duration: 800,
         once: true,
-        offset: 100
+        offset: 50,
+        disable: 'mobile'
     });
 
     // Countdown Timer logic
