@@ -16,12 +16,16 @@ class GoogleSheetSync:
         try:
             scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
             creds_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'credentials.json')
+            import json
             
-            if not os.path.exists(creds_path):
-                print("[Sheet Sync ERROR] credentials.json not found! Cannot sync.")
+            if os.environ.get('GOOGLE_CREDENTIALS'):
+                creds_dict = json.loads(os.environ.get('GOOGLE_CREDENTIALS'))
+                creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+            elif os.path.exists(creds_path):
+                creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
+            else:
+                print("[Sheet Sync ERROR] credentials not found! Cannot sync.")
                 return None
-                
-            creds = ServiceAccountCredentials.from_json_keyfile_name(creds_path, scope)
             cls._client = gspread.authorize(creds)
             cls._spreadsheet = cls._client.open_by_key(cls._sheet_id)
             return cls._spreadsheet
