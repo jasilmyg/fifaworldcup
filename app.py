@@ -28,21 +28,28 @@ def create_app(config_class=Config):
     app.register_blueprint(user_bp)
     app.register_blueprint(admin_bp)
 
-    # Ensure database directory exists
-    os.makedirs(os.path.join(app.root_path, 'database'), exist_ok=True)
-    
+    # Ensure database directory exists safely
+    try:
+        os.makedirs(os.path.join(app.root_path, 'database'), exist_ok=True)
+    except OSError:
+        pass # Ignore for read-only systems like Vercel
+        
     with app.app_context():
-        db.create_all()
-        # Create default admin if not exists
-        if not User.query.filter_by(mobile='admin').first():
-            hashed_pw = bcrypt.generate_password_hash('admin123').decode('utf-8')
-            admin = User(name='Admin', mobile='admin', password=hashed_pw, is_admin=True)
-            db.session.add(admin)
-            db.session.commit()
-            print("Default admin created: mobile=admin, password=admin123")
+        try:
+            db.create_all()
+            # Create default admin if not exists
+            if not User.query.filter_by(mobile='admin').first():
+                hashed_pw = bcrypt.generate_password_hash('admin123').decode('utf-8')
+                admin = User(name='Admin', mobile='admin', password=hashed_pw, is_admin=True)
+                db.session.add(admin)
+                db.session.commit()
+        except Exception as e:
+            print(f"DB Error: {e}")
 
     return app
 
+# Expose app globally for Vercel
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True, host='0.0.0.0', port=5000)
